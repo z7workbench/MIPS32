@@ -7,11 +7,10 @@
 `define alu_sll 4'h6
 `define alu_lui 4'h7
 
-module alu(busA, busB, busC, ALUOp, zero, OFsign);
+module alu(busA, busB, busC, ALUOp);
     input   [31:0] busA, busB;
     input   [3:0] ALUOp;
     output  [31:0] busC;
-    output  zero, OFsign;
 
     wire [32:0] tmp_rlt;
 
@@ -26,8 +25,5 @@ module alu(busA, busB, busC, ALUOp, zero, OFsign);
                    (ALUOp == `alu_sll) ? busA << busB[4:0] :
                    (ALUOp == `alu_lui) ? busB << 16 : 
                    (ALUOp == `alu_nop) ? 0 : 0;
-
-    assign  zero = (busC == 0);
-    assign  OFsign = (tmp_rlt[32] != tmp_rlt[31]);
 
 endmodule // alu
