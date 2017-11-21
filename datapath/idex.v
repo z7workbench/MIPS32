@@ -9,12 +9,13 @@ module idex(clk, i_busA, i_busB, i_imm32, i_rd, i_signals, o_busA, o_busB, o_imm
     output  [31:0]  o_busB;
     output  [31:0]  o_imm32;
     output  [4:0]   o_rd;
-    output          o_GPRWr, o_BSel, o_DMWr, o_MTR, o_ALUOp;
+    output  [3:0]   o_ALUOp;
+    output          o_GPRWr, o_BSel, o_DMWr, o_MTR;
 
     reg     [31:0]  busA;
     reg     [31:0]  busB;
     reg     [31:0]  imm32;
-    // GPRWr, BSel, DMWr, MTR, ALUOp[4:0]
+    // GPRWr, BSel, DMWr, MTR, ALUOp[3:0]
     reg     [7:0]   signals;
     reg     [4:0]   rd;
 
