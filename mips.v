@@ -19,7 +19,7 @@ module mips(clk, clr);
     wire            GPRWrMEM, DMWrMEM, MTRMEM, lwMEM;
 
     wire    [31:0]  extbusA, extbusB;
-    wire    [1:0]   extASel, extBSel;
+    wire    [2:0]   extASel, extBSel;
     wire            startEX, startMEM;
 
     wire            GPRWrWB;
@@ -40,7 +40,7 @@ module mips(clk, clr);
     memwb   u_memwb(.clk(clk), .i_busC(busCMEM), .i_out(outMEM), .i_rd(rdMEM), .i_signals({GPRWrMEM, MTRMEM}), .o_busC(busCWB), .o_out(outWB), .o_rd(rdWB), .o_GPRWR(GPRWrWB), .o_MTR(MTRWB));
     mux32_2 u_MTR(.src1(outWB), .src2(busCWB), .sel(MTRWB), .rlt(busW));
 
-    forwarding  u_forwarding(.start(start), .startEX(startMEM), .rs(rs), .rt(rt), .rdEX(rdEX), .lwEX(lwEX), .rdMEM(rdMEM), .lwMEM(lwMEM), .GPRWrEX(GPRWrEX), .GPRWrMEM(GPRWrMEM), .ASel(extASel), .BSel(extBSel));
-    mux32_4     u_extA(.src1(busAID), .src2(busCEX), .src3(busCMEM), .src4(outMEM), .sel(extASel), .rlt(extbusA));
-    mux32_4     u_extB(.src1(busBID), .src2(busCEX), .src3(busCMEM), .src4(outMEM), .sel(extBSel), .rlt(extbusB));
+    forwarding  u_forwarding(.start(start), .startEX(startMEM), .rs(rs), .rt(rt), .rdEX(rdEX), .lwEX(lwEX), .rdMEM(rdMEM), .lwMEM(lwMEM), .rdWB(rdWB), .GPRWrEX(GPRWrEX), .GPRWrMEM(GPRWrMEM), .GPRWrWB(GPRWrWB), .ASel(extASel), .BSel(extBSel));
+    mux32_5     u_extA(.src1(busAID), .src2(busCEX), .src3(busCMEM), .src4(outMEM), .src5(busW), .sel(extASel), .rlt(extbusA));
+    mux32_5     u_extB(.src1(busBID), .src2(busCEX), .src3(busCMEM), .src4(outMEM), .src5(busW), .sel(extBSel), .rlt(extbusB));
 endmodule // mips
