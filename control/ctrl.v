@@ -25,10 +25,10 @@
 `define Exe     3'b011
 `define OpMem   3'b100
 `define WrBack  3'b101
-module ctrl(clk, clr, decdOp, zero, PCWr, GPRWr, ExtOp, RWSel, BSel, DMWr, MemToReg, nPCOp, ALUOp, start);
+module ctrl(clk, clr, decdOp, zero, PCWr, GPRWr, ExtOp, RWSel, BSel, DMWr, MemToReg, nPCOp, ALUOp, start, lw);
     input   [6:0]   decdOp;
     input           clk, clr, zero;
-    output          PCWr, GPRWr, ExtOp, RWSel, BSel, DMWr, MemToReg;
+    output          PCWr, GPRWr, ExtOp, RWSel, BSel, DMWr, MemToReg, lw;
     output  [1:0]   nPCOp;
     output  [3:0]   ALUOp;
     output  reg     start;
@@ -49,7 +49,7 @@ module ctrl(clk, clr, decdOp, zero, PCWr, GPRWr, ExtOp, RWSel, BSel, DMWr, MemTo
     assign  ALUOp = ((decdOp == `ins_addu) || (decdOp == `ins_lw) || (decdOp == `ins_sw) || (decdOp == `ins_beq)) ? `alu_add : 
                     (decdOp == `ins_subu) ? `alu_sub : 
                     (decdOp == `ins_ori) ? `alu_or : `alu_nop;
-
+    assign  lw = (decdOp == `ins_lw);
     // Finite State Machine
     always @(posedge clk) begin
         if(clr)

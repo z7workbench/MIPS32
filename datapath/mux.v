@@ -31,3 +31,13 @@ module mux32_3(src1, src2, src3, sel, rlt);
     assign  rlt = (sel == 2'b00) ? src1 : 
                   (sel == 2'b01) ? src2 : src3;
 endmodule // mux32_3
+
+module mux32_4(src1, src2, src3, src4, sel, rlt);
+    input   [31:0] src1, src2, src3, src4;
+    input   [1:0] sel;
+    output  [31:0] rlt;
+
+    assign  rlt = (sel == 2'b00) ? src1 : 
+                  (sel == 2'b01) ? src2 :
+                  (sel == 2'b10) ? src3 : src4;
+endmodule // mux32_3
