@@ -9,7 +9,7 @@ module gpr(clk, clr, GPRWr, busW, rw, rs, rt, busA, busB, zero);
     integer i;
     assign  busA = reg_files[rs];
     assign  busB = reg_files[rt];
-    assign  zero = busA^busB;
+    assign  zero = (busA == busB) ? 1 : 0;
     
     always @(posedge clk) begin
         if (clr) begin

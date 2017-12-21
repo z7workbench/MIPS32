@@ -17,8 +17,8 @@ module alu(busA, busB, busC, ALUOp);
     assign  tmp_rlt = (ALUOp == `alu_add) ? {busA[31], busA[31:0]} + {busB[31], busB[31:0]} : 
                       (ALUOp == `alu_slt) ? {busA[31], busA[31:0]} - {busB[31], busB[31:0]} : 32'd0;
 
-    assign  busC = (ALUOp == `alu_add) ? tmp_rlt[31:0] : 
-                   (ALUOp == `alu_sub) ? busA - busB : 
+    assign  busC = (ALUOp == `alu_add) ? {busA[31], busA[31:0]} + {busB[31], busB[31:0]} : 
+                   (ALUOp == `alu_sub) ? {busA[31], busA[31:0]} - {busB[31], busB[31:0]} : 
                    (ALUOp == `alu_and) ? busA & busB : 
                    (ALUOp == `alu_or)  ? busA | busB : 
                    (ALUOp == `alu_slt) ? {31'd0, tmp_rlt[32]} : 

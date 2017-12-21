@@ -13,18 +13,18 @@ module mips(clk, clr);
     wire    [4:0]   rs, rt, rdID, rdNew, rdEX, rdMEM, rdWB;
     wire    [3:0]   ALUOpID, ALUOpEX;
     wire    [1:0]   nPCOp;
-    wire            zero, PCWr;
+    wire            zero, PCWr, start;
     wire            GPRWrID, ExtOp, RWSel, BSelID, DMWrID, MTRID;
     wire            GPRWrEX, BSelEX, DMWrEX, MTREX;
     wire            GPRWrMEM, DMWrMEM, MTRMEM;
 
     wire            GPRWrWB;
 
-    npc     u_npc(.pc_in(current), .imm26(imm26), .imm16(imm16), .nPCOp(nPCOp), .zero(zero), .pc_out(next));
+    npc     u_npc(.pc_in(current), .imm26(imm26), .imm16(imm16), .nPCOp(nPCOp), .zero(zero), .start(start), .pc_out(next));
     pc      u_pc(.clk(clk), .clr(clr), .PCWr(PCWr), .pc_in(next), .pc_out(current));
     im_4k   u_im(.pc_addr(current), .ins(ins));
     ifid    u_ifid(.clk(clk), .i_ins(ins), .o_rs(rs), .o_rt(rt), .o_rd(rdID), .o_imm16(imm16), .o_imm26(imm26), .o_op(decdOp));
-    ctrl    u_ctrl(.clk(clk), .clr(clr), .decdOp(decdOp), .PCWr(PCWr), .GPRWr(GPRWrID), .ExtOp(ExtOp), .RWSel(RWSel), .BSel(BSelID), .DMWr(DMWrID), .MemToReg(MTRID), .nPCOp(nPCOp), .ALUOp(ALUOpID));
+    ctrl    u_ctrl(.clk(clk), .clr(clr), .decdOp(decdOp), .zero(zero), .PCWr(PCWr), .GPRWr(GPRWrID), .ExtOp(ExtOp), .RWSel(RWSel), .BSel(BSelID), .DMWr(DMWrID), .MemToReg(MTRID), .nPCOp(nPCOp), .ALUOp(ALUOpID), .start(start));
     gpr     u_gpr(.clk(clk), .clr(clr), .GPRWr(GPRWrWB), .busW(busW), .rw(rdWB), .rs(rs), .rt(rt), .busA(busAID), .busB(busBID), .zero(zero));
     ext     u_ext(.ExtOp(ExtOp), .imm16(imm16), .imm32(imm32ID));
     mux5_2  u_dist(.src1(rt), .src2(rdID), .sel(RWSel), .rlt(rdNew));

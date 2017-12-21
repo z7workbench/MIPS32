@@ -6,6 +6,10 @@
 `define ins_beq     7'b0001000
 `define ins_j       7'b0000100
 
+`define npc_nml     2'b00
+`define npc_beq     2'b01
+`define npc_j       2'b10
+
 `define alu_nop 4'h0
 `define alu_add 4'h1
 `define alu_sub 4'h2
@@ -21,25 +25,29 @@
 `define Exe     3'b011
 `define OpMem   3'b100
 `define WrBack  3'b101
-module ctrl(clk, clr, decdOp, PCWr, GPRWr, ExtOp, RWSel, BSel, DMWr, MemToReg, nPCOp, ALUOp);
+module ctrl(clk, clr, decdOp, zero, PCWr, GPRWr, ExtOp, RWSel, BSel, DMWr, MemToReg, nPCOp, ALUOp, start);
     input   [6:0]   decdOp;
-    input           clk, clr;
+    input           clk, clr, zero;
     output          PCWr, GPRWr, ExtOp, RWSel, BSel, DMWr, MemToReg;
     output  [1:0]   nPCOp;
     output  [3:0]   ALUOp;
+    output  reg     start;
 
-    reg     [2:0] state;
+    reg     [2:0]   state;
+    reg             flag;
 
-    assign  PCWr = 1'b1;
-    assign  GPRWr = ((decdOp == `ins_addu) || (decdOp == `ins_subu) || (decdOp == `ins_ori) || (decdOp == `ins_lw)) ? 1 : 0;
+    // assign  PCWr = 1'b1;
+    assign  PCWr = (flag && ((decdOp == `ins_j) || ((decdOp == `ins_beq) && zero))) ? 0 : 1;
+    assign  GPRWr = (!flag && ((decdOp == `ins_addu) || (decdOp == `ins_subu) || (decdOp == `ins_ori) || (decdOp == `ins_lw))) ? 1 : 0;
     assign  ExtOp = ((decdOp == `ins_ori) || (decdOp == `ins_lw) || (decdOp == `ins_sw) || (decdOp == `ins_beq)) ? 1 : 0;
     assign  RWSel = ((decdOp == `ins_addu) || (decdOp == `ins_subu)) ? 1 : 0;
     assign  BSel = ((decdOp == `ins_ori) || (decdOp == `ins_lw) || (decdOp == `ins_sw) || (decdOp == `ins_beq)) ? 1 : 0;
-    assign  DMWr = (decdOp == `ins_sw) ? 1 : 0;
+    assign  DMWr = (!flag && (decdOp == `ins_sw)) ? 1 : 0;
     assign  MemToReg = (decdOp == `ins_lw) ? 0 : 1;
-    assign  nPCOp = 0;
+    assign  nPCOp = (decdOp == `ins_beq) ? `npc_beq : 
+                    (decdOp == `ins_j) ? `npc_j : `npc_nml;
     assign  ALUOp = ((decdOp == `ins_addu) || (decdOp == `ins_lw) || (decdOp == `ins_sw) || (decdOp == `ins_beq)) ? `alu_add : 
-                    (decdOp == `alu_sub) ? `alu_sub : 
+                    (decdOp == `ins_subu) ? `alu_sub : 
                     (decdOp == `ins_ori) ? `alu_or : `alu_nop;
 
     // Finite State Machine
@@ -54,6 +62,16 @@ module ctrl(clk, clr, decdOp, PCWr, GPRWr, ExtOp, RWSel, BSel, DMWr, MemToReg, n
             `OpMem  : state <= `WrBack;
             `WrBack : state <= `Fetch;
         endcase
+        if(!flag && ((decdOp == `ins_j) || ((decdOp == `ins_beq) && zero)))
+            flag <= 1;
+        else flag <= 0;
+        start <= 0;
     end
 
+
+    initial 
+    begin
+        state = 0;
+        start = 1;
+    end
 endmodule // ctrl
