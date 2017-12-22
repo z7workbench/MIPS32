@@ -25,27 +25,26 @@
 `define Exe     3'b011
 `define OpMem   3'b100
 `define WrBack  3'b101
-module ctrl(clk, clr, decdOp, zero, PCWr, GPRWr, ExtOp, RWSel, BSel, DMWr, MemToReg, nPCOp, ALUOp, start, lw);
+module ctrl(clk, clr, decdOp, zero, PCWr, GPRWr, ExtOp, RWSel, BSel, DMWr, MemToReg, nPCOp, ALUOp, lw);
     input   [6:0]   decdOp;
     input           clk, clr, zero;
     output          PCWr, GPRWr, ExtOp, RWSel, BSel, DMWr, MemToReg, lw;
     output  [1:0]   nPCOp;
     output  [3:0]   ALUOp;
-    output  reg     start;
 
     reg     [2:0]   state;
     reg             flag;
 
     // assign  PCWr = 1'b1;
-    assign  PCWr = (flag && ((decdOp == `ins_j) || ((decdOp == `ins_beq) && zero))) ? 0 : 1;
+    assign  PCWr = (flag && ((decdOp === `ins_j) || ((decdOp === `ins_beq) && zero))) ? 0 : 1;
     assign  GPRWr = (!flag && ((decdOp == `ins_addu) || (decdOp == `ins_subu) || (decdOp == `ins_ori) || (decdOp == `ins_lw))) ? 1 : 0;
     assign  ExtOp = ((decdOp == `ins_ori) || (decdOp == `ins_lw) || (decdOp == `ins_sw) || (decdOp == `ins_beq)) ? 1 : 0;
     assign  RWSel = ((decdOp == `ins_addu) || (decdOp == `ins_subu)) ? 1 : 0;
     assign  BSel = ((decdOp == `ins_ori) || (decdOp == `ins_lw) || (decdOp == `ins_sw) || (decdOp == `ins_beq)) ? 1 : 0;
     assign  DMWr = (!flag && (decdOp == `ins_sw)) ? 1 : 0;
     assign  MemToReg = (decdOp == `ins_lw) ? 0 : 1;
-    assign  nPCOp = (decdOp == `ins_beq) ? `npc_beq : 
-                    (decdOp == `ins_j) ? `npc_j : `npc_nml;
+    assign  nPCOp = (decdOp === `ins_beq) ? `npc_beq : 
+                    (decdOp === `ins_j) ? `npc_j : `npc_nml;
     assign  ALUOp = ((decdOp == `ins_addu) || (decdOp == `ins_lw) || (decdOp == `ins_sw) || (decdOp == `ins_beq)) ? `alu_add : 
                     (decdOp == `ins_subu) ? `alu_sub : 
                     (decdOp == `ins_ori) ? `alu_or : `alu_nop;
@@ -65,13 +64,11 @@ module ctrl(clk, clr, decdOp, zero, PCWr, GPRWr, ExtOp, RWSel, BSel, DMWr, MemTo
         if(!flag && ((decdOp == `ins_j) || ((decdOp == `ins_beq) && zero)))
             flag <= 1;
         else flag <= 0;
-        start <= 0;
     end
 
 
     initial 
     begin
         state = 0;
-        start = 1;
     end
 endmodule // ctrl

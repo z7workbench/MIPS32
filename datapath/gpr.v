@@ -1,15 +1,13 @@
-module gpr(clk, clr, GPRWr, busW, rw, rs, rt, busA, busB, zero);
+module gpr(clk, clr, GPRWr, busW, rw, rs, rt, busA, busB);
     input   [31:0] busW;
     input   [4:0] rw, rs, rt;
     input   clk, clr, GPRWr;
     output  [31:0] busA, busB;
-    output  zero;
 
     reg     [31:0] reg_files [31:0];
     integer i;
     assign  busA = reg_files[rs];
     assign  busB = reg_files[rt];
-    assign  zero = (busA == busB) ? 1 : 0;
     
     always @(posedge clk) begin
         if (clr) begin
