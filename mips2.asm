@@ -6,7 +6,6 @@ ori     $s2,$s2,1
 ori     $s3,$s3,6
 ori     $s4,$s4,1
 ori     $s5,$s5,7
-ori     $s6,$s6,0
 ori     $s7,$s7,2
 
 addu    $t0,$s1,$s4
